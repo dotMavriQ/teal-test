@@ -4,16 +4,98 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book List</title>
+    <link rel="icon" type="image/svg+xml" href="tealdiamond.svg" />
+    <title>TEAL - The Essential Aggregator Library</title>
     <style>
+      /* Nord Color Scheme */
+      :root {
+        --nord0: #2e3440;
+        --nord1: #3b4252;
+        --nord2: #434c5e;
+        --nord3: #4c566a;
+        --nord4: #d8dee9;
+        --nord5: #e5e9f0;
+        --nord6: #eceff4;
+        --nord7: #8fbcbb;
+        --nord8: #88c0d0;
+        --nord9: #81a1c1;
+        --nord10: #5e81ac;
+        --nord11: #bf616a;
+        --nord12: #d08770;
+        --nord13: #ebcb8b;
+        --nord14: #a3be8c;
+        --nord15: #b48ead;
+      }
+
+      /* Styles */
+      body {
+        background-color: var(--nord0);
+        color: var(--nord6);
+        font-family: Arial, sans-serif;
+      }
+
+      #bookTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      #bookTable th {
+        background-color: var(--nord2);
+        color: var(--nord6);
+        padding: 10px;
+        text-align: left;
+      }
+
+      #bookTable td {
+        background-color: var(--nord1);
+        color: var(--nord5);
+        padding: 8px;
+        text-align: left;
+        word-break: keep-all;
+      }
+
       img {
         max-width: 100px;
         max-height: 150px;
+      }
+
+      /* Make it responsive */
+      @media screen and (max-width: 768px) {
+        #bookTable {
+          display: block;
+          overflow-x: auto;
+        }
+
+        #bookTable th,
+        #bookTable td {
+          padding: 5px;
+        }
+      }
+
+      /* ASCII Art */
+      pre {
+        font-family: "Courier New", monospace;
+        color: var(--nord7);
+        background-color: var(--nord3);
+        padding: 10px;
+        overflow: auto;
+        border-radius: 4px;
       }
     </style>
   </head>
 
   <body>
+    <pre>
+      ████████╗███████╗ █████╗ ██╗     
+      ╚══██╔══╝██╔════╝██╔══██╗██║     
+         ██║   █████╗  ███████║██║     
+         ██║   ██╔══╝  ██╔══██║██║     
+         ██║   ███████╗██║  ██║███████╗
+         ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
+                                                                       
+    </pre>
+
     <table id="bookTable" border="1">
       <thead>
         <tr>
