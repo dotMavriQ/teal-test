@@ -9,6 +9,11 @@ def extract_books(json_content):
     data = json.loads(json_content)
     for shelf_type in ['read', 'to-read']:
         for entry in data[shelf_type]:
+            # Check if the binding is 'Audio CD', if so, skip this entry
+            binding = entry.get('Binding', '')
+            if binding == 'Audio CD':
+                continue
+            
             title = entry['Title']
             pages_str = entry['Number of Pages']
             if pages_str:
@@ -22,7 +27,7 @@ def filter_books(books):
 
 def get_top_10_books(books):
     """Returns the top 10 books with the lowest number of pages."""
-    return sorted(books, key=lambda x: x.pages)[:50]
+    return sorted(books, key=lambda x: x.pages)[:10]  # Note: fixed the slice end index to 10
 
 # Read the output.json file
 with open('output.json', 'r') as file:
