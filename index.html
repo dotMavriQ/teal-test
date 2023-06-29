@@ -82,6 +82,12 @@
         overflow: auto;
         border-radius: 4px;
       }
+      /* Add this to make the header sticky */
+      #bookTable th {
+        position: sticky;
+        top: 0;
+        z-index: 10; /* Optional: Increase z-index to make sure the header stays above other content */
+      }
     </style>
   </head>
 
@@ -140,6 +146,7 @@
         .addEventListener("change", function () {
           var isChecked = this.checked;
           var colsToHide = [
+            "Book Id",
             "Author l-f",
             "Additional Authors",
             "ISBN13",
