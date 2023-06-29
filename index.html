@@ -96,6 +96,11 @@
                                                                        
     </pre>
 
+    <div>
+      <input type="checkbox" id="advancedMode" />
+      <label for="advancedMode">Advanced Mode</label>
+    </div>
+
     <table id="bookTable" border="1">
       <thead>
         <tr>
@@ -130,6 +135,43 @@
     </table>
 
     <script>
+      document
+        .getElementById("advancedMode")
+        .addEventListener("change", function () {
+          var isChecked = this.checked;
+          var colsToHide = [
+            "Author l-f",
+            "Additional Authors",
+            "ISBN13",
+            "Original Publication Year",
+            "Date Read",
+            "Date Added",
+            "Bookshelves with positions",
+            "Spoiler",
+          ];
+
+          var headers = Array.from(
+            document.querySelectorAll("#bookTable th")
+          ).map((th) => th.innerText);
+          colsToHide.forEach((colName) => {
+            var colIndex = headers.indexOf(colName);
+            if (colIndex !== -1) {
+              var cells = Array.from(
+                document.querySelectorAll(
+                  `#bookTable tr td:nth-child(${colIndex + 1})`
+                )
+              );
+              cells.forEach(
+                (cell) => (cell.style.display = isChecked ? "" : "none")
+              );
+              var header = document.querySelector(
+                `#bookTable th:nth-child(${colIndex + 1})`
+              );
+              header.style.display = isChecked ? "" : "none";
+            }
+          });
+        });
+
       fetch("output.json")
         .then((response) => response.json())
         .then((data) => {
@@ -141,7 +183,6 @@
             data[category].forEach((book) => {
               const newRow = table.insertRow();
 
-              // Add cover art as an image
               const coverCell = newRow.insertCell();
               if (book.Coverart) {
                 const img = document.createElement("img");
@@ -149,7 +190,6 @@
                 coverCell.appendChild(img);
               }
 
-              // Add rest of the book data
               Object.keys(book).forEach((key) => {
                 if (key !== "Coverart") {
                   const newCell = newRow.insertCell();
