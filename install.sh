@@ -7,9 +7,17 @@ echo "Starting TEAL installation..."
 if [ ! -f .env ]; then
     echo "Creating .env file..."
     cp .env.example .env
-    php artisan key:generate
-    echo "APP_NAME=TEAL" >> .env
+    sed -i 's/APP_NAME=Laravel/APP_NAME=TEAL/g' .env
+    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/g' .env
+    # Get the absolute path to the database
+    DB_PATH=$(pwd)/database/database.sqlite
+    echo "DB_CONNECTION=sqlite" >> .env
+    echo "DB_DATABASE=$DB_PATH" >> .env
 fi
+
+# Generate application key
+echo "Generating application key..."
+php artisan key:generate
 
 # Step 2: Make sure the SQLite database exists
 if [ ! -f database/database.sqlite ]; then
