@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="text-center mb-5">Welcome to TEAL, {{ $user->name }}</h1>
+            <h1 class="text-center mb-5">Welcome to TEAL, {{ Auth::user()->name }}</h1>
         </div>
     </div>
     
@@ -46,27 +46,21 @@
                 <div class="card-header">Recent Activity</div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="material-icons me-2">book</span>
-                                Started reading "Introduction to Coding"
-                            </div>
-                            <span class="badge bg-primary rounded-pill">2 days ago</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="material-icons me-2">play_circle_filled</span>
-                                Watched "Basic Algorithms"
-                            </div>
-                            <span class="badge bg-primary rounded-pill">1 week ago</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="material-icons me-2">sports_esports</span>
-                                Completed "Code Challenge #5"
-                            </div>
-                            <span class="badge bg-primary rounded-pill">2 weeks ago</span>
-                        </li>
+                        @if(count($recentBooks) > 0)
+                            @foreach($recentBooks as $book)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="material-icons me-2">book</span>
+                                    <a href="{{ route('books.show', $book) }}">{{ $book->title }}</a> by {{ $book->author }}
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ $book->created_at->diffForHumans() }}</span>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="list-group-item text-center">
+                                <p class="mb-0">No books added yet. <a href="{{ route('books.create') }}">Add your first book</a> or <a href="{{ route('books.import.form') }}">import from Goodreads</a>.</p>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </div>
@@ -80,7 +74,7 @@
                         <div class="col-md-4 text-center">
                             <div class="stat-circle reading">
                                 <span class="material-icons">book</span>
-                                <h4>0</h4>
+                                <h4>{{ $totalBooks }}</h4>
                                 <p>Books</p>
                             </div>
                         </div>

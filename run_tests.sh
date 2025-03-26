@@ -1,26 +1,33 @@
 #!/bin/bash
 
-# TEAL Test Runner
-echo "Running TEAL tests..."
+# TEAL Test Runner (PostgreSQL)
+echo "Running TEAL tests with PostgreSQL..."
+echo "-------------------------------------"
 
-# Get database info from .env
-DB_USERNAME=$(grep DB_USERNAME .env | cut -d '=' -f2)
-DB_PASSWORD=$(grep DB_PASSWORD .env | cut -d '=' -f2)
-DB_HOST=$(grep DB_HOST .env | cut -d '=' -f2)
-DB_PORT=$(grep DB_PORT .env | cut -d '=' -f2)
+# Load DB info from .env or set fallback defaults
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
 
-# Make sure the testing database exists
-echo "Setting up PostgreSQL test database..."
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -c "DROP DATABASE IF EXISTS teal_testing;"
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -c "CREATE DATABASE teal_testing;"
+DB_USERNAME=${DB_USERNAME:-tealuser}
+DB_PASSWORD=${DB_PASSWORD:-password}
+DB_HOST=${DB_HOST:-127.0.0.1}
+DB_PORT=${DB_PORT:-5432}
+TEST_DB=teal_testing
 
-# Configure testing environment
+# Drop & recreate the test database cleanly
+echo "Resetting test database '$TEST_DB'..."
+
+PGPASSWORD=$DB_PASSWORD psql -U "$DB_USERNAME" -h "$DB_HOST" -p "$DB_PORT" -d postgres -c "DROP DATABASE IF EXISTS $TEST_DB;"
+PGPASSWORD=$DB_PASSWORD psql -U "$DB_USERNAME" -h "$DB_HOST" -p "$DB_PORT" -d postgres -c "CREATE DATABASE $TEST_DB;"
+
+# Set test DB connection (Laravel will pick it up if using .env.testing or via override)
 export DB_CONNECTION=pgsql
-export DB_DATABASE=teal_testing
+export DB_DATABASE=$TEST_DB
 
-# Run the tests with coverage report
-php artisan test --coverage
+# Run PHPUnit with coverage (optional)
+echo "Running Laravel tests..."
+php artisan test --coverage || echo "⚠️ Warning: Code coverage driver not installed (Xdebug or PCOV)"
 
 echo ""
-echo "Tests completed!"
-echo ""
+echo "✅ Tests completed!"

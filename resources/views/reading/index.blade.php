@@ -12,7 +12,7 @@
         <div class="col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h2 class="card-title">Books</h2>
+                    <h2 class="card-title">Books ({{ $totalBooks }})</h2>
                     <p class="card-text">Access your collection of books, import from Goodreads, and manage your reading list.</p>
                     <a href="{{ route('books.index') }}" class="btn btn-primary btn-lg">
                         <span class="material-icons">menu_book</span> Browse Books
