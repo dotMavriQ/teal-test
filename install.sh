@@ -3,6 +3,11 @@
 # TEAL Installation Script
 echo "Starting TEAL installation..."
 
+# Check for required PHP extensions
+php -m | grep -q pdo_pgsql || { echo "ERROR: PHP extension pdo_pgsql is not installed. Please install it."; exit 1; }
+php -m | grep -q pgsql || { echo "WARNING: PHP extension pgsql is recommended. Consider installing it."; }
+php -m | grep -q bcmath || { echo "WARNING: PHP extension bcmath is recommended. Consider installing it."; }
+
 # Step 1: Make sure the .env file exists
 if [ ! -f .env ]; then
     echo "Creating .env file..."
@@ -12,11 +17,11 @@ fi
 
 # Generate application key
 echo "Generating application key..."
-php artisan key:generate
+php artisan key:generate --force
 
-# Step 2: Check PostgreSQL connection
-echo "Checking PostgreSQL connection..."
-echo "NOTE: Make sure PostgreSQL is installed and running with the credentials in .env"
+# Step 2: Check PostgreSQL installation and setup database
+echo "Setting up PostgreSQL database..."
+echo "NOTE: You need PostgreSQL installed and running on your system"
 
 # Get database info from .env
 DB_DATABASE=$(grep DB_DATABASE .env | cut -d '=' -f2)

@@ -2,8 +2,11 @@
 /public/hot
 /public/storage
 /storage/*.key
-database/database.sqlite
-database/testing.sqlite
+# PostgreSQL files
+*.pgdump
+*.psql
+pg_data/
+.pg_*
 .env.backup.pgsql
 *.dump
 pg_data/
@@ -21,3 +24,12 @@ yarn-error.log
 /_ide_helper.php
 /_ide_helper_models.php
 .phpstorm.meta.php
+
+# Utility and diagnostic files
+check_auth.php
+check_db.php
+diagnose.php
+fix.php
+fix_auth.php
+teal
+teal_testing

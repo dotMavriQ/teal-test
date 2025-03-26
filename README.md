@@ -30,11 +30,10 @@ TEAL is a Laravel-based application for tracking and managing reading collection
 
 ### Installation Steps
 1. Clone the repository
-2. Configure PostgreSQL:
+2. Set up PostgreSQL with the provided script:
    ```bash
-   # Create a database for TEAL
-   createdb teal
-   # Or use pgAdmin or another PostgreSQL admin tool
+   # This script will create the required PostgreSQL user and databases
+   ./setup_postgres.sh
    ```
 3. Run the installation script: `./install.sh`
 4. Start the server with `php artisan serve`

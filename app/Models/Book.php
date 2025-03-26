@@ -84,6 +84,14 @@ class Book extends Model
     }
     
     /**
+     * Get the book's slug
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+    
+    /**
      * Get the route key for the model.
      */
     public function getRouteKeyName()
@@ -96,11 +104,17 @@ class Book extends Model
      */
     public function generateSlug()
     {
-        $slug = Str::slug($this->title);
+        $baseSlug = Str::slug($this->title);
+        $slug = $baseSlug;
+        $counter = 0;
         
-        $count = static::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
+        // Check if the slug already exists
+        while (static::where('slug', $slug)->exists()) {
+            $counter++;
+            $slug = "{$baseSlug}-{$counter}";
+        }
         
-        return $count ? "{$slug}-{$count}" : $slug;
+        return $slug;
     }
 
     /**

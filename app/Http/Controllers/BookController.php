@@ -141,22 +141,72 @@ class BookController extends Controller
             'author' => 'required|string|max:255',
             'description' => 'nullable|string',
             'isbn' => 'nullable|string|max:20',
+            'isbn13' => 'nullable|string|max:20',
+            'asin' => 'nullable|string|max:20',
+            'num_pages' => 'nullable|integer',
             'publication_date' => 'nullable|date',
             'format' => 'nullable|string|max:50',
             'language' => 'nullable|string|max:50',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'user_rating' => 'nullable|integer|min:0|max:100',
+            'date_added' => 'nullable|date',
+            'date_started' => 'nullable|date',
+            'date_read' => 'nullable|date',
+            'reading_status' => 'nullable|string|in:unread,next_up,reading,read',
+            'shelf' => 'nullable|string',
         ]);
         
+        // Handle reading status if it's set
+        if ($request->has('reading_status')) {
+            switch ($validated['reading_status']) {
+                case 'unread':
+                case 'next_up':
+                    $validated['date_started'] = null;
+                    $validated['date_read'] = null;
+                    break;
+                case 'reading':
+                    $validated['date_started'] = $validated['date_started'] ?? now()->toDateString();
+                    $validated['date_read'] = null;
+                    break;
+                case 'read':
+                    $validated['date_started'] = $validated['date_started'] ?? now()->toDateString();
+                    $validated['date_read'] = $validated['date_read'] ?? now()->toDateString();
+                    break;
+            }
+        }
+        
+        // Handle shelf status
+        if ($request->has('shelf')) {
+            // Convert shelf to owned boolean for database storage
+            if (in_array($validated['shelf'], ['1', 'owned', 1])) {
+                $validated['owned'] = true;
+            } elseif (in_array($validated['shelf'], ['0', 'not_owned', 0])) {
+                $validated['owned'] = false;
+            } else {
+                // For custom shelf values like 'wish', 'borrowed', etc.
+                // We'll store a string in the 'shelf' field when we add it to the database
+                // For now, just set 'owned' to false for these values
+                $validated['owned'] = false;
+            }
+        }
+        
+        // Update book with validated data
         $book->fill([
             'title' => $validated['title'],
             'author' => $validated['author'],
             'description' => $validated['description'],
             'isbn' => $validated['isbn'],
+            'isbn13' => $validated['isbn13'] ?? null,
+            'asin' => $validated['asin'] ?? null,
+            'num_pages' => $validated['num_pages'] ?? null,
             'publication_date' => $validated['publication_date'],
             'format' => $validated['format'],
             'language' => $validated['language'],
             'user_rating' => $validated['user_rating'],
+            'date_added' => $validated['date_added'],
+            'date_started' => $validated['date_started'],
+            'date_read' => $validated['date_read'],
+            'owned' => $validated['owned'] ?? $book->owned,
         ]);
         
         // Handle cover image upload
@@ -185,9 +235,14 @@ class BookController extends Controller
             session()->flash('image_success', 'Book cover image was successfully updated.');
         }
         
+        // If the title changed, regenerate the slug
+        if ($book->isDirty('title')) {
+            $book->slug = $book->generateSlug();
+        }
+        
         $book->save();
         
-        return redirect()->route('books.show', $book)
+        return redirect()->route('books.show', $book->slug)
             ->with('success', 'Book updated successfully.');
     }
     
@@ -236,9 +291,23 @@ class BookController extends Controller
             // Map Goodreads data to our Book model
             $title = $entry['title'] ?? 'Unknown Title';
             
-            // Check if book already exists
-            $existingBook = Book::where('isbn', $entry['isbn'] ?? '')
-                ->orWhere('isbn13', $entry['isbn13'] ?? '')
+            // Check if book already exists by ISBN, ISBN13, or title+author combination
+            $existingBook = Book::where(function($query) use ($entry) {
+                    if (!empty($entry['isbn'])) {
+                        $query->where('isbn', $entry['isbn']);
+                    }
+                })
+                ->orWhere(function($query) use ($entry) {
+                    if (!empty($entry['isbn13'])) {
+                        $query->where('isbn13', $entry['isbn13']);
+                    }
+                })
+                ->orWhere(function($query) use ($entry, $title) {
+                    if (!empty($title) && !empty($entry['author'])) {
+                        $query->where('title', $title)
+                              ->where('author', $entry['author'] ?? 'Unknown Author');
+                    }
+                })
                 ->first();
             
             if ($existingBook) {

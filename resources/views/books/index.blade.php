@@ -159,42 +159,42 @@
                                         <img src="{{ $book->getCoverImageUrl() }}" class="img-fluid book-cover rounded shadow-sm" alt="{{ $book->title }}" style="width: 70px; height: 105px; object-fit: cover;">
                                     </a>
                                 </td>
-                                <td>
+                                <td data-sort-value="{{ $book->title }}">
                                     <a href="{{ route('books.show', $book->getSlug()) }}" class="book-title fw-medium d-block text-truncate" style="max-width: 250px;">{{ $book->title }}</a>
-                                    @if($book->dateStarted && !$book->dateRead)
+                                    @if($book->date_started && !$book->date_read)
                                         <div class="progress mt-2" style="height: 4px; width: 100px;">
                                             <div class="progress-bar" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                     @endif
                                 </td>
-                                <td><span class="author-name">{{ $book->author }}</span></td>
-                                <td>
+                                <td data-sort-value="{{ $book->author }}"><span class="author-name">{{ $book->author }}</span></td>
+                                <td data-sort-value="{{ $book->format ?? 'zzz' }}">
                                     @if($book->format)
                                         <span class="format-badge">{{ $book->format }}</span>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td data-sort-value="{{ $book->publicationDate ?? '0' }}">
-                                    @if($book->publicationDate)
-                                        <span class="year-badge">{{ date('Y', strtotime($book->publicationDate)) }}</span>
+                                <td data-sort-value="{{ $book->publication_date ?? '0' }}">
+                                    @if($book->publication_date)
+                                        <span class="year-badge">{{ date('Y', strtotime($book->publication_date)) }}</span>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td data-sort-value="{{ $book->dateAdded ?? '0' }}">
-                                    @if($book->dateAdded)
-                                        <span class="date-label">{{ date('M j, Y', strtotime($book->dateAdded)) }}</span>
+                                <td data-sort-value="{{ $book->date_added ?? '0' }}">
+                                    @if($book->date_added)
+                                        <span class="date-label">{{ date('M j, Y', strtotime($book->date_added)) }}</span>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td data-sort-value="{{ $book->userRating ?? 0 }}">
+                                <td data-sort-value="{{ $book->user_rating ?? 0 }}">
                                     <div class="rating">
                                         {!! $book->getFormattedRating() !!}
                                     </div>
                                 </td>
-                                <td>
+                                <td data-sort-value="{{ $book->getReadStatus() }}">
                                     <span class="status-badge status-{{ strtolower($book->getReadStatus()) }}">
                                         {{ $book->getReadStatus() }}
                                     </span>
@@ -224,6 +224,17 @@
                 const headers = table.querySelectorAll('th.sortable');
                 let currentSort = { column: '', direction: 'asc' };
                 
+                // Map column names to indices (1-based because the first column is cover)
+                const columnMapping = {
+                    'title': 1,
+                    'author': 2,
+                    'format': 3,
+                    'published': 4,
+                    'dateAdded': 5,
+                    'rating': 6,
+                    'status': 7
+                };
+                
                 headers.forEach(header => {
                     header.addEventListener('click', () => {
                         const column = header.dataset.sort;
@@ -242,6 +253,9 @@
                         
                         // Update current sort
                         currentSort = { column, direction };
+                        
+                        // Log for debugging
+                        console.log(`Sorted by ${column} in ${direction} order`);
                     });
                 });
                 
@@ -249,38 +263,103 @@
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
                     
+                    // Convert column name to index
+                    const columnIndex = columnMapping[column];
+                    
+                    if (!columnIndex) {
+                        console.error(`Column ${column} not found in mapping`);
+                        return;
+                    }
+                    
                     // Sort the rows
                     rows.sort((a, b) => {
+                        // Get the cells
+                        const cellsA = a.querySelectorAll('td');
+                        const cellsB = b.querySelectorAll('td');
+                        
+                        if (cellsA.length <= columnIndex || cellsB.length <= columnIndex) {
+                            console.error('Row does not have enough cells');
+                            return 0;
+                        }
+                        
+                        const cellA = cellsA[columnIndex];
+                        const cellB = cellsB[columnIndex];
+                        
+                        // Get values, prioritizing data-sort-value attributes if they exist
                         let valueA, valueB;
                         
-                        // Get the column index
-                        const columnIndex = Array.from(headers).findIndex(h => h.dataset.sort === column);
-                        
-                        // Check if the column has a data-sort-value attribute
-                        if (a.querySelectorAll('td')[columnIndex].hasAttribute('data-sort-value')) {
-                            valueA = a.querySelectorAll('td')[columnIndex].getAttribute('data-sort-value');
-                            valueB = b.querySelectorAll('td')[columnIndex].getAttribute('data-sort-value');
+                        if (cellA.hasAttribute('data-sort-value') && cellB.hasAttribute('data-sort-value')) {
+                            valueA = cellA.getAttribute('data-sort-value');
+                            valueB = cellB.getAttribute('data-sort-value');
+                            
+                            // Handle empty values
+                            if (valueA === '') valueA = null;
+                            if (valueB === '') valueB = null;
+                            
+                            // Handle numeric values
+                            if (!isNaN(valueA) && !isNaN(valueB)) {
+                                valueA = Number(valueA);
+                                valueB = Number(valueB);
+                            }
                         } else {
-                            valueA = a.querySelectorAll('td')[columnIndex].textContent.trim();
-                            valueB = b.querySelectorAll('td')[columnIndex].textContent.trim();
+                            // Get text content as a fallback
+                            valueA = cellA.textContent.trim();
+                            valueB = cellB.textContent.trim();
                         }
                         
-                        // Try to convert to numbers if possible
-                        if (!isNaN(valueA) && !isNaN(valueB)) {
-                            valueA = Number(valueA);
-                            valueB = Number(valueB);
+                        // Handle special columns
+                        if (column === 'title' || column === 'author') {
+                            // For text fields, do case-insensitive comparison
+                            valueA = (valueA || '').toString().toLowerCase();
+                            valueB = (valueB || '').toString().toLowerCase();
+                        } else if (column === 'published' || column === 'dateAdded') {
+                            // For dates, convert to timestamp
+                            if (valueA && valueA !== '0') {
+                                try {
+                                    valueA = new Date(valueA).getTime();
+                                } catch (e) {
+                                    valueA = 0;
+                                }
+                            } else {
+                                valueA = 0;
+                            }
+                            
+                            if (valueB && valueB !== '0') {
+                                try {
+                                    valueB = new Date(valueB).getTime();
+                                } catch (e) {
+                                    valueB = 0;
+                                }
+                            } else {
+                                valueB = 0;
+                            }
+                        } else if (column === 'rating') {
+                            // Ensure ratings are numeric
+                            valueA = Number(valueA || 0);
+                            valueB = Number(valueB || 0);
                         }
                         
-                        // Compare the values
-                        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-                        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-                        return 0;
+                        // Handle null values - null values should sort to the end
+                        if (valueA === null && valueB === null) return 0;
+                        if (valueA === null) return direction === 'asc' ? 1 : -1;
+                        if (valueB === null) return direction === 'asc' ? -1 : 1;
+                        
+                        // Compare values
+                        let result;
+                        if (valueA < valueB) {
+                            result = -1;
+                        } else if (valueA > valueB) {
+                            result = 1;
+                        } else {
+                            result = 0;
+                        }
+                        
+                        // Apply sort direction
+                        return direction === 'asc' ? result : -result;
                     });
                     
-                    // Reappend rows in the new order
-                    rows.forEach(row => {
-                        tbody.appendChild(row);
-                    });
+                    // Clear and re-append rows
+                    rows.forEach(row => tbody.appendChild(row));
                 }
                 
                 // Search functionality
@@ -341,10 +420,13 @@
                     document.getElementById('bookCount').textContent = `Showing ${visibleCount} of ${rows.length} books`;
                 }
                 
-                // Initial sort by title
+                // Initial sort by title - trigger the title header click event
                 const titleHeader = Array.from(headers).find(h => h.dataset.sort === 'title');
                 if (titleHeader) {
-                    titleHeader.click();
+                    // Set default sort to title ascending
+                    currentSort = { column: 'title', direction: 'asc' };
+                    titleHeader.querySelector('.sort-icon').textContent = 'expand_less';
+                    sortTable('title', 'asc');
                 }
             });
         </script>

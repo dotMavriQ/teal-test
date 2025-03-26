@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -44,9 +44,13 @@ return [
         ],
         
         'doctrine' => [
-            'driver' => 'pdo_sqlite',
-            'memory' => false,
-            'path' => env('DB_DATABASE', '/home/dotmavriq/Code/TEAL/database/database.sqlite'),
+            'driver' => 'pdo_pgsql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'dbname' => env('DB_DATABASE', 'teal'),
+            'user' => env('DB_USERNAME', 'tealuser'),
+            'password' => env('DB_PASSWORD', 'password'),
+            'charset' => 'utf8',
         ],
 
         'mysql' => [

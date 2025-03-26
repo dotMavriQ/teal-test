@@ -107,8 +107,20 @@ class MigrateFileDataToDatabaseCommand extends Command
         $bar->start();
         
         foreach ($booksData as $bookData) {
-            // Check if book already exists
-            $book = Book::where('slug', $bookData['slug'] ?? '')->first();
+            // Check if book already exists - check by slug, isbn, or title+author combination
+            $book = Book::where('slug', $bookData['slug'] ?? '')
+                ->orWhere(function($query) use ($bookData) {
+                    if (!empty($bookData['isbn'])) {
+                        $query->where('isbn', $bookData['isbn']);
+                    }
+                })
+                ->orWhere(function($query) use ($bookData) {
+                    if (!empty($bookData['title']) && !empty($bookData['author'])) {
+                        $query->where('title', $bookData['title'])
+                                ->where('author', $bookData['author']);
+                    }
+                })
+                ->first();
             
             if (!$book) {
                 // Map old JSON structure to new database structure
