@@ -1,0 +1,161 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// TEAL Custom Styles
+
+// Material Design inspired styles
+.btn {
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .material-icons {
+    vertical-align: middle;
+    margin-right: 8px;
+    font-size: 1.2em;
+  }
+}
+
+// Card styles
+.card {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-header {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+}
+
+// TEAL Dashboard Feature Buttons
+.feature-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: $gruvbox-dark1;
+  color: $gruvbox-light1;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.5rem;
+  
+  &:hover {
+    background-color: $gruvbox-dark2;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .material-icons {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: $gruvbox-bright-blue;
+  }
+  
+  .feature-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  &.reading {
+    .material-icons { color: $gruvbox-bright-green; }
+  }
+  
+  &.video {
+    .material-icons { color: $gruvbox-bright-red; }
+  }
+  
+  &.games {
+    .material-icons { color: $gruvbox-bright-yellow; }
+  }
+}
+
+// Login page styles
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  
+  .login-form-container {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    .card-header {
+      padding: 1.5rem;
+      
+      h4 {
+        margin-bottom: 0;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+    }
+    
+    .card-body {
+      padding: 2rem;
+    }
+    
+    .form-control {
+      padding: 0.75rem 1rem;
+      height: auto;
+      
+      &:focus {
+        box-shadow: none;
+        border-color: $gruvbox-bright-blue;
+      }
+    }
+    
+    .btn-primary {
+      padding: 0.75rem 2rem;
+    }
+  }
+}
+
+// TEAL branding
+.teal-logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $gruvbox-bright-aqua;
+  letter-spacing: 1px;
+  
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+// Navbar styles
+.navbar {
+  background-color: $gruvbox-dark1 !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  
+  .nav-link {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.25rem;
+  }
+}

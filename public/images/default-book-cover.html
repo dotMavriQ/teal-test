@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Default Book Cover</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282828;
+        }
+        
+        .book-cover {
+            width: 250px;
+            height: 400px;
+            background-color: #3c3836;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 10px solid #504945;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            font-family: Arial, sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: #8ec07c;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            color: #ebdbb2;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #a89984;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 70px solid #83a598;
+            margin-bottom: 20px;
+        }
+        
+        .triangle-small {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 40px solid #8ec07c;
+            position: absolute;
+            transform: rotate(180deg);
+            bottom: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-cover">
+        <div class="logo">TEAL</div>
+        <div class="title">Book</div>
+        <div class="subtitle">No Cover Available</div>
+        <div class="triangle"></div>
+        <div class="triangle-small"></div>
+    </div>
+</body>
+</html>

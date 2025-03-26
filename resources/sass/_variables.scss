@@ -1,0 +1,74 @@
+// Gruvbox Dark Theme Colors
+$gruvbox-dark0-hard: #1d2021;
+$gruvbox-dark0: #282828;
+$gruvbox-dark0-soft: #32302f;
+$gruvbox-dark1: #3c3836;
+$gruvbox-dark2: #504945;
+$gruvbox-dark3: #665c54;
+$gruvbox-dark4: #7c6f64;
+
+$gruvbox-light0-hard: #f9f5d7;
+$gruvbox-light0: #fbf1c7;
+$gruvbox-light0-soft: #f2e5bc;
+$gruvbox-light1: #ebdbb2;
+$gruvbox-light2: #d5c4a1;
+$gruvbox-light3: #bdae93;
+$gruvbox-light4: #a89984;
+
+$gruvbox-bright-red: #fb4934;
+$gruvbox-bright-green: #b8bb26;
+$gruvbox-bright-yellow: #fabd2f;
+$gruvbox-bright-blue: #83a598;
+$gruvbox-bright-purple: #d3869b;
+$gruvbox-bright-aqua: #8ec07c;
+$gruvbox-bright-orange: #fe8019;
+
+$gruvbox-neutral-red: #cc241d;
+$gruvbox-neutral-green: #98971a;
+$gruvbox-neutral-yellow: #d79921;
+$gruvbox-neutral-blue: #458588;
+$gruvbox-neutral-purple: #b16286;
+$gruvbox-neutral-aqua: #689d6a;
+$gruvbox-neutral-orange: #d65d0e;
+
+// Bootstrap Overrides
+$body-bg: $gruvbox-dark0;
+$body-color: $gruvbox-light1;
+
+$theme-colors: (
+  "primary": $gruvbox-bright-blue,
+  "secondary": $gruvbox-bright-aqua,
+  "success": $gruvbox-bright-green,
+  "info": $gruvbox-neutral-blue,
+  "warning": $gruvbox-bright-yellow,
+  "danger": $gruvbox-bright-red,
+  "light": $gruvbox-light3,
+  "dark": $gruvbox-dark1
+);
+
+// Typography
+$font-family-sans-serif: 'Roboto', sans-serif;
+$font-size-base: 1rem;
+$line-height-base: 1.6;
+
+// Cards
+$card-bg: $gruvbox-dark1;
+$card-border-color: $gruvbox-dark3;
+$card-cap-bg: $gruvbox-dark2;
+
+// Inputs
+$input-bg: $gruvbox-dark2;
+$input-color: $gruvbox-light1;
+$input-border-color: $gruvbox-dark3;
+$input-focus-border-color: $gruvbox-bright-blue;
+$input-focus-box-shadow: 0 0 0 0.25rem rgba($gruvbox-bright-blue, 0.25);
+
+// Navbar
+$navbar-dark-color: $gruvbox-light2;
+$navbar-dark-hover-color: $gruvbox-light0;
+$navbar-dark-active-color: $gruvbox-light0;
+
+// Buttons
+$btn-border-radius: 0.25rem;
+$btn-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+$btn-focus-box-shadow: 0 0 0 0.25rem rgba($gruvbox-bright-blue, 0.5);
