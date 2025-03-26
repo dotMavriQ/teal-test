@@ -16,22 +16,43 @@ TEAL is a Laravel-based application for tracking and managing reading collection
 
 - Laravel 10
 - Bootstrap 5 with custom theming
-- SQLite database
+- PostgreSQL database
 - Eloquent ORM
 - Laravel's built-in authentication
 
 ## Installation
 
+### Prerequisites
+1. PHP 8.1+ with required extensions
+2. Composer
+3. PostgreSQL database server
+4. Node.js and npm for frontend assets
+
+### Installation Steps
 1. Clone the repository
-2. Run the installation script: `./install.sh`
-3. Start the server with `php artisan serve`
+2. Configure PostgreSQL:
+   ```bash
+   # Create a database for TEAL
+   createdb teal
+   # Or use pgAdmin or another PostgreSQL admin tool
+   ```
+3. Run the installation script: `./install.sh`
+4. Start the server with `php artisan serve`
 
 The installation script will:
 - Create the necessary .env file
-- Set up the SQLite database
+- Connect to PostgreSQL and create the database if it doesn't exist
 - Run migrations and seed the database
 - Create a storage link for file uploads
 - Migrate any existing file-based data to the database
+
+### Database Configuration
+The default database configuration uses:
+- Database: `teal`
+- Username: `postgres`
+- Password: `postgres`
+
+You can change these in your `.env` file after installation.
 
 ## Usage
 
@@ -55,7 +76,16 @@ The application includes comprehensive tests for all features. To run the tests:
 ./run_tests.sh
 ```
 
-This will run all tests using an in-memory SQLite database and generate a coverage report.
+This will:
+1. Create a dedicated PostgreSQL test database (teal_testing)
+2. Run all tests against the test database
+3. Generate a coverage report
+
+The test suite includes:
+- Unit tests for model methods
+- Feature tests for authentication
+- Feature tests for book operations
+- Tests for data migration from JSON to database
 
 ## License
 

@@ -8,21 +8,42 @@ if [ ! -f .env ]; then
     echo "Creating .env file..."
     cp .env.example .env
     sed -i 's/APP_NAME=Laravel/APP_NAME=TEAL/g' .env
-    sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/g' .env
-    # Get the absolute path to the database
-    DB_PATH=$(pwd)/database/database.sqlite
-    echo "DB_CONNECTION=sqlite" >> .env
-    echo "DB_DATABASE=$DB_PATH" >> .env
 fi
 
 # Generate application key
 echo "Generating application key..."
 php artisan key:generate
 
-# Step 2: Make sure the SQLite database exists
-if [ ! -f database/database.sqlite ]; then
-    echo "Creating SQLite database..."
-    touch database/database.sqlite
+# Step 2: Check PostgreSQL connection
+echo "Checking PostgreSQL connection..."
+echo "NOTE: Make sure PostgreSQL is installed and running with the credentials in .env"
+
+# Get database info from .env
+DB_DATABASE=$(grep DB_DATABASE .env | cut -d '=' -f2)
+DB_USERNAME=$(grep DB_USERNAME .env | cut -d '=' -f2)
+DB_PASSWORD=$(grep DB_PASSWORD .env | cut -d '=' -f2)
+DB_HOST=$(grep DB_HOST .env | cut -d '=' -f2)
+DB_PORT=$(grep DB_PORT .env | cut -d '=' -f2)
+
+# Check if psql is installed
+if ! command -v psql &> /dev/null; then
+    echo "WARNING: PostgreSQL client (psql) not found. Please install PostgreSQL."
+    echo "You can continue, but the database setup may fail."
+    read -p "Press enter to continue or Ctrl+C to cancel..."
+else
+    # Check if database exists, create if not
+    if ! PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -lqt | cut -d \| -f 1 | grep -qw $DB_DATABASE; then
+        echo "Creating PostgreSQL database: $DB_DATABASE..."
+        PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USERNAME -c "CREATE DATABASE $DB_DATABASE;"
+        if [ $? -eq 0 ]; then
+            echo "Database created successfully!"
+        else
+            echo "WARNING: Failed to create database. Please check your PostgreSQL installation and credentials."
+            echo "You may need to create the database manually."
+        fi
+    else
+        echo "Database $DB_DATABASE already exists, continuing..."
+    fi
 fi
 
 # Step 3: Run migrations

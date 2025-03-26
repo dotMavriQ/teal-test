@@ -110,4 +110,21 @@ class MigrateFileDataTest extends TestCase
             'email' => 'dotmavriq@dotmavriq.life',
         ]);
     }
+    
+    /**
+     * Tear down the test case.
+     */
+    public function tearDown(): void
+    {
+        // Clean up any files created during tests
+        if (Storage::disk('local')->exists('books.json')) {
+            Storage::disk('local')->delete('books.json');
+        }
+        
+        if (Storage::disk('local')->exists('users.json')) {
+            Storage::disk('local')->delete('users.json');
+        }
+        
+        parent::tearDown();
+    }
 }
