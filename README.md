@@ -47,6 +47,16 @@ After installation, you can log in with:
 - Email: dotmavriq@dotmavriq.life
 - Password: TEALAdmin@2025#Secure
 
+## Testing
+
+The application includes comprehensive tests for all features. To run the tests:
+
+```bash
+./run_tests.sh
+```
+
+This will run all tests using an in-memory SQLite database and generate a coverage report.
+
 ## License
 
 This application is licensed under the MIT license.
