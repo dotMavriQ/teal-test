@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FileAuthController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReadingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,42 +17,43 @@ use App\Http\Controllers\FileAuthController;
 |
 */
 
-// Redirect home to login form
+// Redirect home to login form if not authenticated
 Route::get('/', function () {
-    return redirect()->route('file.login.form');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
-// File Auth Routes
-Route::get('/login', [FileAuthController::class, 'showLoginForm'])->name('file.login.form');
-Route::post('/login', [FileAuthController::class, 'login'])->name('file.login');
-Route::post('/logout', [FileAuthController::class, 'logout'])->name('file.logout');
-Route::get('/dashboard', [FileAuthController::class, 'dashboard'])->name('dashboard');
+// Auth Routes
+Auth::routes();
 
-// Reading Routes (main reading section)
-Route::get('/reading', [App\Http\Controllers\ReadingController::class, 'index'])->name('reading.index');
+// Dashboard
+Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
-// Book Routes
-Route::group(['middleware' => 'web'], function () {
+// Protected Routes
+Route::middleware(['auth'])->group(function () {
+    // Reading Routes (main reading section)
+    Route::get('/reading', [ReadingController::class, 'index'])->name('reading.index');
+    
+    // Book Routes
     // List and create routes
-    Route::get('/books', [App\Http\Controllers\BookController::class, 'index'])->name('books.index');
-    Route::get('/books/create', [App\Http\Controllers\BookController::class, 'create'])->name('books.create');
+    Route::get('/books', [BookController::class, 'index'])->name('books.index');
+    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
     
     // Import routes
-    Route::get('/books/import/form', [App\Http\Controllers\BookController::class, 'importForm'])->name('books.import.form');
-    Route::post('/books/import', [App\Http\Controllers\BookController::class, 'import'])->name('books.import');
+    Route::get('/books/import/form', [BookController::class, 'importForm'])->name('books.import.form');
+    Route::post('/books/import', [BookController::class, 'import'])->name('books.import');
     
     // Store new book
-    Route::post('/books', [App\Http\Controllers\BookController::class, 'store'])->name('books.store');
+    Route::post('/books', [BookController::class, 'store'])->name('books.store');
     
     // ID-based routes for editing and management
-    Route::get('/books/id/{id}', [App\Http\Controllers\BookController::class, 'show'])->name('books.show.id');
-    Route::get('/books/edit/{id}', [App\Http\Controllers\BookController::class, 'edit'])->name('books.edit');
-    Route::put('/books/update/{id}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
-    Route::delete('/books/delete/{id}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
+    Route::get('/books/id/{id}', [BookController::class, 'show'])->name('books.show.id');
+    Route::get('/books/edit/{book}', [BookController::class, 'edit'])->name('books.edit');
+    Route::put('/books/update/{book}', [BookController::class, 'update'])->name('books.update');
+    Route::delete('/books/delete/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     
     // Slug-based route for book details (must be last because it's a catch-all)
-    Route::get('/books/{slug}', [App\Http\Controllers\BookController::class, 'showBySlug'])->name('books.show');
+    Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
 });
-
-// Disable traditional Laravel Auth Routes
-// Auth::routes();

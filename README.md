@@ -16,18 +16,22 @@ TEAL is a Laravel-based application for tracking and managing reading collection
 
 - Laravel 10
 - Bootstrap 5 with custom theming
-- File-based data storage
-- Custom authentication system
+- SQLite database
+- Eloquent ORM
+- Laravel's built-in authentication
 
 ## Installation
 
 1. Clone the repository
-2. Run `composer install`
-3. Copy `.env.example` to `.env`
-4. Run `php artisan key:generate`
-5. Create storage link with `php artisan storage:link`
-6. Set up the admin user with `php artisan setup:users`
-7. Start the server with `php artisan serve`
+2. Run the installation script: `./install.sh`
+3. Start the server with `php artisan serve`
+
+The installation script will:
+- Create the necessary .env file
+- Set up the SQLite database
+- Run migrations and seed the database
+- Create a storage link for file uploads
+- Migrate any existing file-based data to the database
 
 ## Usage
 
@@ -36,6 +40,12 @@ TEAL is a Laravel-based application for tracking and managing reading collection
 1. Export your Goodreads library as CSV
 2. Convert to JSON format
 3. Use the Import Books page to upload the JSON file
+
+### Default Login
+
+After installation, you can log in with:
+- Email: dotmavriq@dotmavriq.life
+- Password: TEALAdmin@2025#Secure
 
 ## License
 

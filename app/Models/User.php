@@ -2,49 +2,43 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User
+class User extends Authenticatable
 {
-    public $id;
-    public $name;
-    public $email;
-    public $password;
-    public $rememberToken;
-    public $createdAt;
-    public $updatedAt;
-    
-    public function __construct(array $attributes = [])
-    {
-        $this->fill($attributes);
-    }
-    
-    public function fill(array $attributes): self
-    {
-        foreach ($attributes as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            }
-        }
-        
-        return $this;
-    }
-    
-    public static function findByEmail(string $email)
-    {
-        $users = json_decode(file_get_contents(storage_path('app/users.json')), true);
-        
-        foreach ($users as $userData) {
-            if ($userData['email'] === $email) {
-                return new self($userData);
-            }
-        }
-        
-        return null;
-    }
-    
-    public function verifyPassword(string $password): bool
-    {
-        return Hash::check($password, $this->password);
-    }
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 }

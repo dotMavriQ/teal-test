@@ -2,81 +2,81 @@
 
 namespace App\Models;
 
-class Book
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class Book extends Model
 {
-    public $id;
-    public $title;
-    public $author;
-    public $description;
-    public $isbn;
-    public $isbn13;
-    public $asin;
-    public $numPages;
-    public $coverImage;
-    public $publicationDate;
-    public $format;
-    public $userRating;
-    public $avgRating;
-    public $dateAdded;
-    public $dateStarted;
-    public $dateRead;
-    public $owned;
-    public $language;
-    public $createdAt;
-    public $updatedAt;
-    public $slug;
+    use HasFactory;
     
-    public function __construct(array $attributes = [])
-    {
-        $this->fill($attributes);
-    }
+    protected $fillable = [
+        'title',
+        'author',
+        'description',
+        'isbn',
+        'isbn13',
+        'asin',
+        'num_pages',
+        'cover_image',
+        'publication_date',
+        'format',
+        'user_rating',
+        'avg_rating',
+        'date_added',
+        'date_started',
+        'date_read',
+        'owned',
+        'language',
+        'slug',
+    ];
     
-    public function fill(array $attributes): self
-    {
-        foreach ($attributes as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            }
-        }
-        
-        return $this;
-    }
+    protected $casts = [
+        'publication_date' => 'date',
+        'date_added' => 'date',
+        'date_started' => 'date',
+        'date_read' => 'date',
+        'owned' => 'boolean',
+        'num_pages' => 'integer',
+        'user_rating' => 'integer',
+        'avg_rating' => 'integer',
+    ];
     
     public function getRatingPercentage()
     {
-        if (!$this->userRating) {
+        if (!$this->user_rating) {
             return 0;
         }
         
-        return $this->userRating;
+        return $this->user_rating;
     }
     
     public function getFormattedRating()
     {
-        if (!$this->userRating) {
+        if (!$this->user_rating) {
             return 'Not rated';
         }
         
-        $stars = round($this->userRating / 20); // Convert percentage to 5-star scale
+        $stars = round($this->user_rating / 20); // Convert percentage to 5-star scale
         return str_repeat('★', $stars) . str_repeat('☆', 5 - $stars);
     }
     
     public function getCoverImageUrl()
     {
-        if (!$this->coverImage || $this->coverImage === 'default-book-cover.jpg') {
+        if (!$this->cover_image || $this->cover_image === 'default-book-cover.jpg') {
             return asset('images/book_stock.png');
         }
         
-        return asset('storage/book-covers/' . $this->coverImage);
+        return asset('storage/book-covers/' . $this->cover_image);
     }
     
     public function getReadStatus()
     {
-        if ($this->dateRead) {
+        if ($this->date_read) {
             return 'Read';
         }
         
-        if ($this->dateStarted) {
+        if ($this->date_started) {
             return 'Reading';
         }
         
@@ -84,28 +84,43 @@ class Book
     }
     
     /**
-     * Get the URL-friendly slug for this book
+     * Get the route key for the model.
      */
-    public function getSlug()
+    public function getRouteKeyName()
     {
-        // If we have a slug property, use it
-        if (!empty($this->slug)) {
-            return $this->slug;
-        }
-        
-        // Fallback to a simple slug if none is set
-        $title = $this->title ?? 'book';
-        
-        // Remove special characters and convert to lowercase
-        $slug = preg_replace('/[^a-z0-9]+/', '-', strtolower($title));
-        $slug = trim($slug, '-');
-        
-        // If the slug is empty, use 'book'
-        if (empty($slug)) {
-            $slug = 'book';
-        }
-        
-        return $slug;
+        return 'slug';
     }
     
+    /**
+     * Generate a new unique slug
+     */
+    public function generateSlug()
+    {
+        $slug = Str::slug($this->title);
+        
+        $count = static::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")->count();
+        
+        return $count ? "{$slug}-{$count}" : $slug;
+    }
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($book) {
+            if (empty($book->slug)) {
+                $book->slug = $book->generateSlug();
+            }
+        });
+
+        static::updating(function ($book) {
+            // Only generate a new slug if the title changed
+            if ($book->isDirty('title') && empty($book->slug)) {
+                $book->slug = $book->generateSlug();
+            }
+        });
+    }
 }
